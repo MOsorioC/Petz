@@ -59,6 +59,11 @@ const userSchema = new Schema({
     type: String,
     enum: ['GUEST', 'ADMIN'],
     default: 'GUEST'
+  },
+  isVerified: {
+    type: Boolean,
+    required: true,
+    default: false
   }
 }, {
   timestamps: {

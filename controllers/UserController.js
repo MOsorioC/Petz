@@ -4,6 +4,9 @@ const User = require('../models/User')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
+//validator
+const Validator = require('../helpers/ValidatorHelper')
+
 //variables
 const bcryptSalt = 10
 
@@ -24,20 +27,20 @@ module.exports.createUser = (req, res, next) => {
 
   let errors = {};
 
-  if (name == null) {
+  if (Validator.isEmpty(name)) {
     errors["name"] = "Nombre requerido"
   }
 
-  if (last_name == null) {
+  if (Validator.isEmpty(last_name)) {
     errors["last_name"] = "Apellido requerido"
   }
 
-  if (email == null) {
-    errors["email"] = "Email requerido"
+  if (!Validator.validateEmail(email)) {
+    errors["email"] = "Email no valido"
   }
 
-  if (password == null) {
-    errors["password"] = "Contraseña requerida"
+  if (!Validator.validatePassword(password)) {
+    errors["password"] = "Contraseña no valida"
   }
 
   if (Object.keys(errors).length > 0) {
@@ -70,4 +73,23 @@ module.exports.createUser = (req, res, next) => {
       res.status(500).json({ success: false, message: "Error al guardar, intenta de nuevo" })
     })
   }).catch(err => res.status(500).json({success: false, message: "Error al consultar usuario"}))
+}
+
+module.exports.login = (req, res, next) => {
+  const {email, password} = req.body
+
+  const errors = {}
+
+  if (!Validator.validateEmail(email)) {
+    errors['email'] = "Email no valido"
+  }
+
+  if (!Validator.validatePassword(password)) {
+    errors['password'] = "Contraseña no valida"
+  }
+
+  if (Object.keys(errors).length > 0) {
+    res.status(403).json({success: false, message: "Validaciones requeridas", errors})
+  }
+  
 }
